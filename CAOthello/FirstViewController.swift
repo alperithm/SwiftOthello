@@ -10,6 +10,10 @@ import UIKit
 
 class FirstViewController: UIViewController {
 
+    @IBOutlet weak var turnMessage: UILabel!
+    @IBOutlet weak var blackStoneCount: UILabel!
+    @IBOutlet weak var whiteStoneCount: UILabel!
+    @IBOutlet weak var passButton: UIButton!
     // 定数
     // ボードの中心座標
     var boardCenter:CGPoint = CGPointMake(187.5, 333.5)
@@ -38,15 +42,8 @@ class FirstViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // ボードの設置
-        self.setBoard()
-        
-        // 初期石配置
-        self.setFirstStone()
-        startFlg = false
-        
-        // 先攻後攻設定はここで行う
-        stoneTurn = -1
+        // ゲームの初期化
+        initGame()
     }
 
     override func didReceiveMemoryWarning() {
@@ -57,6 +54,56 @@ class FirstViewController: UIViewController {
     /*
         初期設定
     */
+    
+    // 初期化メソッド
+    func initGame() {
+        // 初期化フラグ
+        startFlg = true
+        
+        // 盤面に出ていたsubViewを全て削除
+        for subview in self.view.subviews {
+            if subview.tag > 0 {
+                subview.removeFromSuperview()
+            }
+        }
+        
+        // ボード情報の初期化
+        boardStatus = [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+        
+        // ボードの設置
+        self.setBoard()
+        
+        // 初期石配置
+        self.setFirstStone()
+        startFlg = false
+        
+        // 先攻後攻設定はここで行う
+        stoneTurn = -1
+        
+        // ターン数の初期化
+        blackTurnCount = 1
+        whiteTurnCount = 1
+        
+        // どちらのターンか表示
+        turnAlert(stoneTurn)
+        
+        // パスボタンは通常隠す
+        passButton.hidden = true
+    }
+    
+    // リセットボタンの動作
+    @IBAction func resetButton(sender: AnyObject) {
+        initGame()
+    }
     
     // ボード表記
     var boardImageView:UIImageView?
@@ -100,10 +147,57 @@ class FirstViewController: UIViewController {
     
     // 石ボタンの設置
     func setFirstStone() {
-        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: -1)
-        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: 1)
-        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: -1)
-        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: 1)
+        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: 1)
+        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: -1)
+        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: 1)
+        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: -1)
+    }
+    
+    /*
+        ターン管理
+    */
+    
+    var blackTurnCount: Int = 1
+    var whiteTurnCount: Int = 1
+    
+    func turnAlert(turn: Int) {
+        // ターンの表示
+        if turn == 1 {
+            turnMessage.text = String(format: "白のターンです：%d手目", whiteTurnCount)
+            turnMessage.textColor = UIColor.whiteColor()
+        } else {
+            turnMessage.text = String(format: "黒のターンです：%d手目", blackTurnCount)
+            turnMessage.textColor = UIColor.blackColor()
+        }
+        // 各色の現在個数の表示
+        blackStoneCount.text = String(format: "黒: %d", countStone(-1))
+        blackStoneCount.textColor = UIColor.blackColor()
+        whiteStoneCount.text = String(format: "白: %d", countStone(1))
+        whiteStoneCount.textColor = UIColor.whiteColor()
+    }
+    
+    func countStone(color: Int) -> Int{
+        var count: Int = 0
+        for status in boardStatus {
+            count += status.filter({$0 == color}).count
+        }
+        return count
+    }
+    
+    func turnChange() {
+        stoneTurn *= -1
+        if stoneTurn != -1 {
+            blackTurnCount++
+        } else {
+            whiteTurnCount++
+        }
+        turnAlert(stoneTurn)
+        if checkPass() {
+            passButton.hidden = false
+        }
+        if checkFullBoard() {
+            gameOver()
+        }
     }
     
     /*
@@ -138,17 +232,17 @@ class FirstViewController: UIViewController {
         if checkPut(numberX, y: numberY) || startFlg {
             // UIImageView インスタンス生成
             // 石の種類を変更
-            setStoneImage(stonePosition.x, positionY: stonePosition.y, color: color)
+            setStoneImage(numberX, y:numberY, positionX: stonePosition.x, positionY: stonePosition.y, color: color)
             
             // 盤上情報の更新
             boardStatus[numberX][numberY] = color
             
             // ターンの交代
-            stoneTurn *= -1
+            turnChange()
         }
     }
     
-    func setStoneImage (positionX: CGFloat, positionY: CGFloat, color: Int) {
+    func setStoneImage (x: Int, y: Int, positionX: CGFloat, positionY: CGFloat, color: Int) {
         if color == 1 {
             stoneImageView = UIImageView(image:whiteStone)
         }else{
@@ -161,6 +255,16 @@ class FirstViewController: UIViewController {
         // ImageView frame をCGRectMakeで作った矩形に合わせる
         stoneImageView!.frame = rect;
         
+        // ImageViewにtagを付ける
+        var tagNumber = x * 10 + y + 1
+        for subview in self.view.subviews {
+            if subview.tag == tagNumber {
+                subview.removeFromSuperview()
+                break
+            }
+        }
+        stoneImageView!.tag = tagNumber
+        
         // view に ImageView を追加する
         self.view.addSubview(stoneImageView!)
     }
@@ -169,6 +273,11 @@ class FirstViewController: UIViewController {
         オセロルールの設定
     */
     func checkPut(x: Int, y: Int) -> Bool {
+        // スタートフラグが立っていたら検知しない
+        if startFlg {
+            return false
+        }
+        
         // 既に石がある場所には置けない
         if boardStatus[x][y] != 0 {
             return false
@@ -176,6 +285,7 @@ class FirstViewController: UIViewController {
         
         // 裏返せない場所には置けない
         if reverse(x, y: y, doReverse: true) == false {
+            showAlert("警告！", msg: "裏返せない場所には置けません。")
             return false
         }
         
@@ -192,7 +302,7 @@ class FirstViewController: UIViewController {
         var reversed: Bool = false;
         
         for var i=0; i < 8; i++ {
-            //隣のマス
+            // 隣のマスを検査
             var x0: Int = x+dir[i][0];
             var y0: Int = y+dir[i][1];
             if(isOut(x0, y: y0) == true){
@@ -205,31 +315,30 @@ class FirstViewController: UIViewController {
                 continue
             }
             
-            //隣の隣から端まで走査して、自分の色があればリバース
+            // 隣の隣から端まで検査して、自分の色を発見したらリバース
             var j: Int = 2;
             while(true){
-                
                 var x1: Int = x + (dir[i][0]*j);
                 var y1: Int = y + (dir[i][1]*j);
                 if(isOut(x1, y: y1) == true){
                     break
                 }
                 
-                //自分の駒があったら、リバース
+                // 自分の駒があったら、リバース
                 if(boardStatus[x1][y1] == stoneTurn){
                     if doReverse {
                         for var k = 1; k < j; k++ {
                             var x2: Int = x + (dir[i][0]*k)
                             var y2: Int = y + (dir[i][1]*k)
                             boardStatus[x2][y2] *= -1
-                            setStoneImage(startPoint.x + (boardWidth*scale / 8) * CGFloat(x2), positionY: startPoint.y + (boardHeight*scale / 8) * CGFloat(y2), color: boardStatus[x2][y2])
+                            setStoneImage(x2, y: y2, positionX: startPoint.x + (boardWidth*scale / 8) * CGFloat(x2), positionY: startPoint.y + (boardHeight*scale / 8) * CGFloat(y2), color: boardStatus[x2][y2])
                         }
                     }
                     reversed = true
                     break
                 }
                 
-                //空白があったら、終了
+                // 何も置いていなければ終了
                 if(boardStatus[x1][y1] == 0){
                     break
                 }
@@ -244,11 +353,73 @@ class FirstViewController: UIViewController {
         return reverse(x, y: y, doReverse: false)
     }
     
+    func checkPass() -> Bool {
+        for var i: Int = 0; i < 8; i++ {
+            for var j: Int = 0; j < 8; j++ {
+                if canReverse(i, y: j) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    
     func isOut(x: Int, y: Int) -> Bool{
         if x<0 || y<0 || x>=8 || y>=8 {
             return true
         }
         return false
+    }
+    
+    /*
+        置ける場所が無くなったらパスボタンを表示
+    */
+    @IBAction func passButton(sender: AnyObject) {
+        stoneTurn *= -1
+        turnAlert(stoneTurn)
+        passButton.hidden = true
+        if checkPass() {
+            gameOver()
+        }
+    }
+    
+    /*
+        盤面が埋まっているかチェック
+    */
+    func checkFullBoard() -> Bool{
+        for var i: Int = 0; i < 8; i++ {
+            for var j: Int = 0; j < 8; j++ {
+                if boardStatus[i][j] == 0 {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    
+    /*
+        勝敗の判定
+    */
+    func gameOver(){
+        var msg: String = String(format: "黒: %d  白: %d", countStone(-1), countStone(1))
+        if countStone(-1) > countStone(1) {
+            showAlert("黒の勝利！", msg: msg)
+        } else if countStone(-1) < countStone(1) {
+            showAlert("白の勝利！", msg: msg)
+        } else {
+            showAlert("引き分け！", msg: msg)
+        }
+    }
+    
+    /*
+        アラートウィンドウ表示
+    */
+    func showAlert (title: String, msg: String) {
+        var alert = UIAlertView()
+        alert.title = title
+        alert.message = msg
+        alert.addButtonWithTitle("OK")
+        alert.show()
     }
 }
 
