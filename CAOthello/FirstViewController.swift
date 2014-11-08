@@ -13,6 +13,7 @@ class FirstViewController: UIViewController {
     @IBOutlet weak var turnMessage: UILabel!
     @IBOutlet weak var blackStoneCount: UILabel!
     @IBOutlet weak var whiteStoneCount: UILabel!
+    @IBOutlet weak var passButton: UIButton!
     // 定数
     // ボードの中心座標
     var boardCenter:CGPoint = CGPointMake(187.5, 333.5)
@@ -94,8 +95,12 @@ class FirstViewController: UIViewController {
         
         // どちらのターンか表示
         turnAlert(stoneTurn)
+        
+        // パスボタンは通常隠す
+        passButton.hidden = true
     }
     
+    // リセットボタンの動作
     @IBAction func resetButton(sender: AnyObject) {
         initGame()
     }
@@ -156,6 +161,7 @@ class FirstViewController: UIViewController {
     var whiteTurnCount: Int = 1
     
     func turnAlert(turn: Int) {
+        // ターンの表示
         if turn == 1 {
             turnMessage.text = String(format: "白のターンです：%d手目", whiteTurnCount)
             turnMessage.textColor = UIColor.whiteColor()
@@ -163,6 +169,7 @@ class FirstViewController: UIViewController {
             turnMessage.text = String(format: "黒のターンです：%d手目", blackTurnCount)
             turnMessage.textColor = UIColor.blackColor()
         }
+        // 各色の現在個数の表示
         blackStoneCount.text = String(format: "黒: %d", countStone(-1))
         blackStoneCount.textColor = UIColor.blackColor()
         whiteStoneCount.text = String(format: "白: %d", countStone(1))
@@ -185,6 +192,9 @@ class FirstViewController: UIViewController {
             whiteTurnCount++
         }
         turnAlert(stoneTurn)
+        if checkPass() {
+            passButton.hidden = false
+        }
     }
     
     /*
@@ -289,7 +299,7 @@ class FirstViewController: UIViewController {
         var reversed: Bool = false;
         
         for var i=0; i < 8; i++ {
-            //隣のマス
+            // 隣のマスを検査
             var x0: Int = x+dir[i][0];
             var y0: Int = y+dir[i][1];
             if(isOut(x0, y: y0) == true){
@@ -302,17 +312,16 @@ class FirstViewController: UIViewController {
                 continue
             }
             
-            //隣の隣から端まで走査して、自分の色があればリバース
+            // 隣の隣から端まで検査して、自分の色を発見したらリバース
             var j: Int = 2;
             while(true){
-                
                 var x1: Int = x + (dir[i][0]*j);
                 var y1: Int = y + (dir[i][1]*j);
                 if(isOut(x1, y: y1) == true){
                     break
                 }
                 
-                //自分の駒があったら、リバース
+                // 自分の駒があったら、リバース
                 if(boardStatus[x1][y1] == stoneTurn){
                     if doReverse {
                         for var k = 1; k < j; k++ {
@@ -326,7 +335,7 @@ class FirstViewController: UIViewController {
                     break
                 }
                 
-                //空白があったら、終了
+                // 何も置いていなければ終了
                 if(boardStatus[x1][y1] == 0){
                     break
                 }
@@ -341,11 +350,28 @@ class FirstViewController: UIViewController {
         return reverse(x, y: y, doReverse: false)
     }
     
+    func checkPass() -> Bool {
+        for var i: Int = 0; i < 8; i++ {
+            for var j: Int = 0; j < 8; j++ {
+                if canReverse(i, y: j) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    
     func isOut(x: Int, y: Int) -> Bool{
         if x<0 || y<0 || x>=8 || y>=8 {
             return true
         }
         return false
+    }
+    
+    /*
+        置ける場所が無くなったらパスボタンを表示
+    */
+    @IBAction func passButton(sender: AnyObject) {
     }
     
     /*

@@ -60,6 +60,24 @@
                                     <action selector="resetButton:" destination="9pv-A4-QxB" eventType="touchUpInside" id="SO6-3e-qqA"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dq1-NN-uMa">
+                                <rect key="frame" x="-23" y="-15" width="46" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <state key="normal" title="Pass">
+                                    <color key="titleColor" red="0.086845735461313023" green="0.14897808564342074" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="503" width="74" height="40"/>
+                                </variation>
+                                <variation key="heightClass=regular-widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="267" y="554" width="74" height="40"/>
+                                </variation>
+                                <connections>
+                                    <action selector="passButton:" destination="9pv-A4-QxB" eventType="touchUpInside" id="5qO-ve-zDB"/>
+                                    <action selector="resetButton:" destination="9pv-A4-QxB" eventType="touchUpInside" id="c8P-zN-Q8S"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.74980310657971549" green="0.65658182960258582" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <variation key="default">
@@ -68,6 +86,7 @@
                                 <exclude reference="FU4-7f-wcc"/>
                                 <exclude reference="8Cl-tY-9VG"/>
                                 <exclude reference="7nv-9j-VwS"/>
+                                <exclude reference="Dq1-NN-uMa"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
@@ -78,10 +97,16 @@
                                 <include reference="7nv-9j-VwS"/>
                             </mask>
                         </variation>
+                        <variation key="heightClass=regular-widthClass=compact">
+                            <mask key="subviews">
+                                <include reference="Dq1-NN-uMa"/>
+                            </mask>
+                        </variation>
                     </view>
                     <tabBarItem key="tabBarItem" title="Game" image="first" id="acW-dT-cKf"/>
                     <connections>
                         <outlet property="blackStoneCount" destination="FU4-7f-wcc" id="XxE-pC-dBd"/>
+                        <outlet property="passButton" destination="Dq1-NN-uMa" id="6Uu-30-ctA"/>
                         <outlet property="turnMessage" destination="18Q-tE-aOS" id="lJs-dl-6mL"/>
                         <outlet property="whiteStoneCount" destination="8Cl-tY-9VG" id="OXe-tq-Dcx"/>
                     </connections>
