@@ -511,6 +511,7 @@
 				8FCD0A5E1A0DAF1900C50EAF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8FCD0A5F1A0DAF1900C50EAF /* Build configuration list for PBXNativeTarget "CAOthelloTests" */ = {
 			isa = XCConfigurationList;
@@ -519,6 +520,7 @@
 				8FCD0A611A0DAF1900C50EAF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

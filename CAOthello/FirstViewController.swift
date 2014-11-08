@@ -13,9 +13,27 @@ class FirstViewController: UIViewController {
     // 定数
     // ボードの中心座標
     var boardCenter:CGPoint = CGPointMake(187.5, 333.5)
+    var startPoint: CGPoint = CGPointMake(0, 147)
     
-    // ターン管理(黒：0, 白：1)
-    var stoneTurn: Boolean = 0
+    /*
+    盤上管理
+    */
+    var boardStatus: [[Int]] =
+    [[0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0]
+    ]
+    
+    // ターン管理(黒：-1, 白：1)
+    var stoneTurn: Int = -1
+    
+    // 初期化フラグ
+    var startFlg: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +41,12 @@ class FirstViewController: UIViewController {
         // ボードの設置
         self.setBoard()
         
+        // 初期石配置
+        self.setFirstStone()
+        startFlg = false
         
+        // 先攻後攻設定はここで行う
+        stoneTurn = -1
     }
 
     override func didReceiveMemoryWarning() {
@@ -31,10 +54,9 @@ class FirstViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    // 石ボタンの設置
-    func setFirstStone() {
-        
-    }
+    /*
+        初期設定
+    */
     
     // ボード表記
     var boardImageView:UIImageView?
@@ -76,6 +98,14 @@ class FirstViewController: UIViewController {
         self.view.addSubview(boardImageView!)
     }
     
+    // 石ボタンの設置
+    func setFirstStone() {
+        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: -1)
+        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: 1)
+        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: -1)
+        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: 1)
+    }
+    
     /*
         盤面タップ処理
     */
@@ -84,7 +114,7 @@ class FirstViewController: UIViewController {
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
         for item in touches {
             let touch = item as UITouch
-            setStone(touch.locationInView(self.view))
+            setStone(touch.locationInView(self.view), color: stoneTurn)
             break
         }
     }
@@ -95,8 +125,7 @@ class FirstViewController: UIViewController {
     let whiteStone:UIImage! = UIImage(named:"disc_white_basic")
     
     // タッチされた座標からマスを特定し、石をセットする
-    func setStone(point: CGPoint){
-        var startPoint: CGPoint = CGPointMake(boardCenter.x - boardWidth*scale/2, boardCenter.y - boardHeight*scale/2)
+    func setStone(point: CGPoint, color: Int){
         var relativeX: CGFloat = point.x - startPoint.x
         var relativeY: CGFloat = point.y - startPoint.y
         // 配列番号の設定
@@ -106,25 +135,120 @@ class FirstViewController: UIViewController {
         var stonePosition: CGPoint = CGPointMake(startPoint.x + (boardWidth*scale / 8) * CGFloat(numberX),
             startPoint.y + (boardHeight*scale / 8) * CGFloat(numberY))
         
-        // UIImageView インスタンス生成
-        // ターン毎に石の種類を変更
-        if stoneTurn == 1 {
+        if checkPut(numberX, y: numberY) || startFlg {
+            // UIImageView インスタンス生成
+            // 石の種類を変更
+            setStoneImage(stonePosition.x, positionY: stonePosition.y, color: color)
+            
+            // 盤上情報の更新
+            boardStatus[numberX][numberY] = color
+            
+            // ターンの交代
+            stoneTurn *= -1
+        }
+    }
+    
+    func setStoneImage (positionX: CGFloat, positionY: CGFloat, color: Int) {
+        if color == 1 {
             stoneImageView = UIImageView(image:whiteStone)
-            stoneTurn = 0
         }else{
             stoneImageView = UIImageView(image:blackStone)
-            stoneTurn = 1
         }
         
         // 石サイズの調整
-        var rect:CGRect = CGRectMake(stonePosition.x + 5.0, stonePosition.y + 5.0, boardWidth*scale / 8 - CGFloat(10.0), boardHeight*scale / 8 - CGFloat(10.0))
+        var rect:CGRect = CGRectMake(positionX + 5.0, positionY + 5.0, boardWidth*scale / 8 - CGFloat(10.0), boardHeight*scale / 8 - CGFloat(10.0))
         
         // ImageView frame をCGRectMakeで作った矩形に合わせる
         stoneImageView!.frame = rect;
         
         // view に ImageView を追加する
         self.view.addSubview(stoneImageView!)
-
+    }
+    
+    /*
+        オセロルールの設定
+    */
+    func checkPut(x: Int, y: Int) -> Bool {
+        // 既に石がある場所には置けない
+        if boardStatus[x][y] != 0 {
+            return false
+        }
+        
+        // 裏返せない場所には置けない
+        if reverse(x, y: y, doReverse: true) == false {
+            return false
+        }
+        
+        return true
+    }
+    
+    func reverse(x: Int, y: Int, doReverse: Bool) -> Bool {
+        var dir: [[Int]] = [
+            [-1,-1], [0,-1], [1,-1],
+            [-1, 0],         [1, 0],
+            [-1, 1], [0, 1], [1, 1]
+        ]
+        
+        var reversed: Bool = false;
+        
+        for var i=0; i < 8; i++ {
+            //隣のマス
+            var x0: Int = x+dir[i][0];
+            var y0: Int = y+dir[i][1];
+            if(isOut(x0, y: y0) == true){
+                continue;
+            }
+            var nextState: Int = boardStatus[x0][y0];
+            if(nextState == stoneTurn){
+                continue
+            }else if(nextState == 0){
+                continue
+            }
+            
+            //隣の隣から端まで走査して、自分の色があればリバース
+            var j: Int = 2;
+            while(true){
+                
+                var x1: Int = x + (dir[i][0]*j);
+                var y1: Int = y + (dir[i][1]*j);
+                if(isOut(x1, y: y1) == true){
+                    break
+                }
+                
+                //自分の駒があったら、リバース
+                if(boardStatus[x1][y1] == stoneTurn){
+                    if doReverse {
+                        for var k = 1; k < j; k++ {
+                            var x2: Int = x + (dir[i][0]*k)
+                            var y2: Int = y + (dir[i][1]*k)
+                            boardStatus[x2][y2] *= -1
+                            setStoneImage(startPoint.x + (boardWidth*scale / 8) * CGFloat(x2), positionY: startPoint.y + (boardHeight*scale / 8) * CGFloat(y2), color: boardStatus[x2][y2])
+                        }
+                    }
+                    reversed = true
+                    break
+                }
+                
+                //空白があったら、終了
+                if(boardStatus[x1][y1] == 0){
+                    break
+                }
+                j++
+            }
+        }
+        
+        return reversed
+    }
+    
+    func canReverse(x: Int, y: Int) -> Bool{
+        return reverse(x, y: y, doReverse: false)
+    }
+    
+    func isOut(x: Int, y: Int) -> Bool{
+        if x<0 || y<0 || x>=8 || y>=8 {
+            return true
+        }
+        return false
     }
 }
 
