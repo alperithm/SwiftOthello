@@ -39,16 +39,8 @@ class FirstViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // ボードの設置
-        self.setBoard()
-        
-        // 初期石配置
-        self.setFirstStone()
-        startFlg = false
-        
-        // 先攻後攻設定はここで行う
-        stoneTurn = -1
-        turnAlart(stoneTurn)
+        // ゲームの初期化
+        initGame()
     }
 
     override func didReceiveMemoryWarning() {
@@ -59,6 +51,38 @@ class FirstViewController: UIViewController {
     /*
         初期設定
     */
+    
+    // 初期化メソッド
+    func initGame() {
+        // ボードの設置
+        self.setBoard()
+        
+        // 初期石配置
+        self.setFirstStone()
+        startFlg = false
+        
+        // ボード情報の初期化
+        boardStatus = [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+        
+        // 先攻後攻設定はここで行う
+        stoneTurn = -1
+        
+        // ターン数の初期化
+        blackTurnCount = 1
+        whiteTurnCount = 1
+        
+        // どちらのターンか表示
+        turnAlert(stoneTurn)
+    }
     
     // ボード表記
     var boardImageView:UIImageView?
@@ -111,19 +135,28 @@ class FirstViewController: UIViewController {
     /*
         ターン管理
     */
-    func turnAlart(turn: Int) {
+    
+    var blackTurnCount: Int = 1
+    var whiteTurnCount: Int = 1
+    
+    func turnAlert(turn: Int) {
         if turn == 1 {
-            turnMessage.text = "白のターンです"
+            turnMessage.text = String(format: "白のターンです：%d手目", whiteTurnCount)
             turnMessage.textColor = UIColor.whiteColor()
         } else {
-            turnMessage.text = "黒のターンです"
+            turnMessage.text = String(format: "黒のターンです：%d手目", blackTurnCount)
             turnMessage.textColor = UIColor.blackColor()
         }
     }
     
     func turnChange() {
         stoneTurn *= -1
-        turnAlart(stoneTurn)
+        if stoneTurn != -1 {
+            blackTurnCount++
+        } else {
+            whiteTurnCount++
+        }
+        turnAlert(stoneTurn)
     }
     
     /*
@@ -189,6 +222,11 @@ class FirstViewController: UIViewController {
         オセロルールの設定
     */
     func checkPut(x: Int, y: Int) -> Bool {
+        // スタートフラグが立っていたら検知しない
+        if startFlg {
+            return false
+        }
+        
         // 既に石がある場所には置けない
         if boardStatus[x][y] != 0 {
             return false
@@ -196,6 +234,7 @@ class FirstViewController: UIViewController {
         
         // 裏返せない場所には置けない
         if reverse(x, y: y, doReverse: true) == false {
+            showAlert("裏返せない場所には置けません。")
             return false
         }
         
@@ -269,6 +308,17 @@ class FirstViewController: UIViewController {
             return true
         }
         return false
+    }
+    
+    /*
+        アラートウィンドウ表示
+    */
+    func showAlert (msg: String) {
+        var alert = UIAlertView()
+        alert.title = "警告！"
+        alert.message = msg
+        alert.addButtonWithTitle("OK")
+        alert.show()
     }
 }
 
