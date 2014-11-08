@@ -282,7 +282,7 @@ class FirstViewController: UIViewController {
         
         // 裏返せない場所には置けない
         if reverse(x, y: y, doReverse: true) == false {
-            showAlert("裏返せない場所には置けません。")
+            showAlert("警告！", msg: "裏返せない場所には置けません。")
             return false
         }
         
@@ -375,14 +375,31 @@ class FirstViewController: UIViewController {
         stoneTurn *= -1
         turnAlert(stoneTurn)
         passButton.hidden = true
+        if checkPass() {
+            gameOver()
+        }
+    }
+    
+    /*
+        勝敗の判定
+    */
+    func gameOver(){
+        var msg: String = String(format: "黒: %d  白: %d", countStone(-1), countStone(1))
+        if countStone(-1) > countStone(1) {
+            showAlert("黒の勝利！", msg: msg)
+        } else if countStone(-1) < countStone(1) {
+            showAlert("白の勝利！", msg: msg)
+        } else {
+            showAlert("引き分け！", msg: msg)
+        }
     }
     
     /*
         アラートウィンドウ表示
     */
-    func showAlert (msg: String) {
+    func showAlert (title: String, msg: String) {
         var alert = UIAlertView()
-        alert.title = "警告！"
+        alert.title = title
         alert.message = msg
         alert.addButtonWithTitle("OK")
         alert.show()
