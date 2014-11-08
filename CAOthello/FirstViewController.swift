@@ -56,6 +56,16 @@ class FirstViewController: UIViewController {
     
     // 初期化メソッド
     func initGame() {
+        // 初期化フラグ
+        startFlg = true
+        
+        // 盤面に出ていたsubViewを全て削除
+        for subview in self.view.subviews {
+            if subview.tag > 0 {
+                subview.removeFromSuperview()
+            }
+        }
+        
         // ボード情報の初期化
         boardStatus = [
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -84,6 +94,10 @@ class FirstViewController: UIViewController {
         
         // どちらのターンか表示
         turnAlert(stoneTurn)
+    }
+    
+    @IBAction func resetButton(sender: AnyObject) {
+        initGame()
     }
     
     // ボード表記
@@ -205,7 +219,7 @@ class FirstViewController: UIViewController {
         if checkPut(numberX, y: numberY) || startFlg {
             // UIImageView インスタンス生成
             // 石の種類を変更
-            setStoneImage(stonePosition.x, positionY: stonePosition.y, color: color)
+            setStoneImage(numberX, y:numberY, positionX: stonePosition.x, positionY: stonePosition.y, color: color)
             
             // 盤上情報の更新
             boardStatus[numberX][numberY] = color
@@ -215,7 +229,7 @@ class FirstViewController: UIViewController {
         }
     }
     
-    func setStoneImage (positionX: CGFloat, positionY: CGFloat, color: Int) {
+    func setStoneImage (x: Int, y: Int, positionX: CGFloat, positionY: CGFloat, color: Int) {
         if color == 1 {
             stoneImageView = UIImageView(image:whiteStone)
         }else{
@@ -227,6 +241,16 @@ class FirstViewController: UIViewController {
         
         // ImageView frame をCGRectMakeで作った矩形に合わせる
         stoneImageView!.frame = rect;
+        
+        // ImageViewにtagを付ける
+        var tagNumber = x * 10 + y + 1
+        for subview in self.view.subviews {
+            if subview.tag == tagNumber {
+                subview.removeFromSuperview()
+                break
+            }
+        }
+        stoneImageView!.tag = tagNumber
         
         // view に ImageView を追加する
         self.view.addSubview(stoneImageView!)
@@ -295,7 +319,7 @@ class FirstViewController: UIViewController {
                             var x2: Int = x + (dir[i][0]*k)
                             var y2: Int = y + (dir[i][1]*k)
                             boardStatus[x2][y2] *= -1
-                            setStoneImage(startPoint.x + (boardWidth*scale / 8) * CGFloat(x2), positionY: startPoint.y + (boardHeight*scale / 8) * CGFloat(y2), color: boardStatus[x2][y2])
+                            setStoneImage(x2, y: y2, positionX: startPoint.x + (boardWidth*scale / 8) * CGFloat(x2), positionY: startPoint.y + (boardHeight*scale / 8) * CGFloat(y2), color: boardStatus[x2][y2])
                         }
                     }
                     reversed = true
