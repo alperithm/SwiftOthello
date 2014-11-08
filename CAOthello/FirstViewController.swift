@@ -10,6 +10,7 @@ import UIKit
 
 class FirstViewController: UIViewController {
 
+    @IBOutlet weak var turnMessage: UILabel!
     // 定数
     // ボードの中心座標
     var boardCenter:CGPoint = CGPointMake(187.5, 333.5)
@@ -47,6 +48,7 @@ class FirstViewController: UIViewController {
         
         // 先攻後攻設定はここで行う
         stoneTurn = -1
+        turnAlart(stoneTurn)
     }
 
     override func didReceiveMemoryWarning() {
@@ -107,6 +109,24 @@ class FirstViewController: UIViewController {
     }
     
     /*
+        ターン管理
+    */
+    func turnAlart(turn: Int) {
+        if turn == 1 {
+            turnMessage.text = "白のターンです"
+            turnMessage.textColor = UIColor.whiteColor()
+        } else {
+            turnMessage.text = "黒のターンです"
+            turnMessage.textColor = UIColor.blackColor()
+        }
+    }
+    
+    func turnChange() {
+        stoneTurn *= -1
+        turnAlart(stoneTurn)
+    }
+    
+    /*
         盤面タップ処理
     */
 
@@ -144,7 +164,7 @@ class FirstViewController: UIViewController {
             boardStatus[numberX][numberY] = color
             
             // ターンの交代
-            stoneTurn *= -1
+            turnChange()
         }
     }
     
