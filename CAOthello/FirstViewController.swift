@@ -11,6 +11,8 @@ import UIKit
 class FirstViewController: UIViewController {
 
     @IBOutlet weak var turnMessage: UILabel!
+    @IBOutlet weak var blackStoneCount: UILabel!
+    @IBOutlet weak var whiteStoneCount: UILabel!
     // 定数
     // ボードの中心座標
     var boardCenter:CGPoint = CGPointMake(187.5, 333.5)
@@ -54,24 +56,24 @@ class FirstViewController: UIViewController {
     
     // 初期化メソッド
     func initGame() {
+        // ボード情報の初期化
+        boardStatus = [
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+        
         // ボードの設置
         self.setBoard()
         
         // 初期石配置
         self.setFirstStone()
         startFlg = false
-        
-        // ボード情報の初期化
-        boardStatus = [
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0]
-        ]
         
         // 先攻後攻設定はここで行う
         stoneTurn = -1
@@ -147,6 +149,18 @@ class FirstViewController: UIViewController {
             turnMessage.text = String(format: "黒のターンです：%d手目", blackTurnCount)
             turnMessage.textColor = UIColor.blackColor()
         }
+        blackStoneCount.text = String(format: "黒: %d", countStone(-1))
+        blackStoneCount.textColor = UIColor.blackColor()
+        whiteStoneCount.text = String(format: "白: %d", countStone(1))
+        whiteStoneCount.textColor = UIColor.whiteColor()
+    }
+    
+    func countStone(color: Int) -> Int{
+        var count: Int = 0
+        for status in boardStatus {
+            count += status.filter({$0 == color}).count
+        }
+        return count
     }
     
     func turnChange() {

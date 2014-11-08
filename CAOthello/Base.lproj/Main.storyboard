@@ -25,22 +25,46 @@
                                     <rect key="frame" x="16" y="28" width="368" height="51"/>
                                 </variation>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="黒：5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FU4-7f-wcc">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="16" y="87" width="186" height="46"/>
+                                </variation>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="白：3" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Cl-tY-9VG">
+                                <rect key="frame" x="0.0" y="-21" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                                <variation key="widthClass=compact" fixedFrame="YES">
+                                    <rect key="frame" x="198" y="87" width="186" height="46"/>
+                                </variation>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="0.74980310657971549" green="0.65658182960258582" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <variation key="default">
                             <mask key="subviews">
                                 <exclude reference="18Q-tE-aOS"/>
+                                <exclude reference="FU4-7f-wcc"/>
+                                <exclude reference="8Cl-tY-9VG"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=compact">
                             <mask key="subviews">
                                 <include reference="18Q-tE-aOS"/>
+                                <include reference="FU4-7f-wcc"/>
+                                <include reference="8Cl-tY-9VG"/>
                             </mask>
                         </variation>
                     </view>
                     <tabBarItem key="tabBarItem" title="Game" image="first" id="acW-dT-cKf"/>
                     <connections>
+                        <outlet property="blackStoneCount" destination="FU4-7f-wcc" id="XxE-pC-dBd"/>
                         <outlet property="turnMessage" destination="18Q-tE-aOS" id="lJs-dl-6mL"/>
+                        <outlet property="whiteStoneCount" destination="8Cl-tY-9VG" id="OXe-tq-Dcx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
