@@ -23,7 +23,8 @@ class FirstViewController: UIViewController {
         // ボードの設置
         self.setBoard()
         
-        
+        // 初期石配置
+        self.setFirstStone()
     }
 
     override func didReceiveMemoryWarning() {
@@ -31,10 +32,9 @@ class FirstViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    // 石ボタンの設置
-    func setFirstStone() {
-        
-    }
+    /*
+        初期設定
+    */
     
     // ボード表記
     var boardImageView:UIImageView?
@@ -74,6 +74,14 @@ class FirstViewController: UIViewController {
         
         // view に ImageView を追加する
         self.view.addSubview(boardImageView!)
+    }
+    
+    // 石ボタンの設置
+    func setFirstStone() {
+        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y - boardHeight*scale/16))
+        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y - boardHeight*scale/16))
+        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y + boardHeight*scale/16))
+        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y + boardHeight*scale/16))
     }
     
     /*
