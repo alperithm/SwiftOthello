@@ -147,10 +147,10 @@ class FirstViewController: UIViewController {
     
     // 石ボタンの設置
     func setFirstStone() {
-        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: -1)
-        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: 1)
-        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: -1)
-        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: 1)
+        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: 1)
+        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y - boardHeight*scale/16), color: -1)
+        setStone(CGPointMake(boardCenter.x + boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: 1)
+        setStone(CGPointMake(boardCenter.x - boardWidth*scale/16, boardCenter.y + boardHeight*scale/16), color: -1)
     }
     
     /*
