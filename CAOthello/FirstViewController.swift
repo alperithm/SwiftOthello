@@ -372,6 +372,9 @@ class FirstViewController: UIViewController {
         置ける場所が無くなったらパスボタンを表示
     */
     @IBAction func passButton(sender: AnyObject) {
+        stoneTurn *= -1
+        turnAlert(stoneTurn)
+        passButton.hidden = true
     }
     
     /*
