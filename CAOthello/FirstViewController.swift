@@ -195,6 +195,9 @@ class FirstViewController: UIViewController {
         if checkPass() {
             passButton.hidden = false
         }
+        if checkFullBoard() {
+            gameOver()
+        }
     }
     
     /*
@@ -378,6 +381,20 @@ class FirstViewController: UIViewController {
         if checkPass() {
             gameOver()
         }
+    }
+    
+    /*
+        盤面が埋まっているかチェック
+    */
+    func checkFullBoard() -> Bool{
+        for var i: Int = 0; i < 8; i++ {
+            for var j: Int = 0; j < 8; j++ {
+                if boardStatus[i][j] == 0 {
+                    return false
+                }
+            }
+        }
+        return true
     }
     
     /*
