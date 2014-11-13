@@ -1,7 +1,7 @@
 SwiftOthello
 ============
 
-サイバーエージェントSwift1dayで作ったやつ
+Swift1day
 
 * ToDo
   * AI対戦実装してみたい！
